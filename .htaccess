@@ -1,0 +1,30 @@
+Options -Indexes
+
+RewriteEngine on
+
+# Site
+RewriteRule ^$ app/controller/siteController.php?action=home [QSA,L]
+RewriteRule ^home/error/?$ app/controller/siteController.php?action=error [QSA,L]
+RewriteRule ^home/?$ app/controller/siteController.php?action=home [QSA,L]
+RewriteRule ^targets/?$ app/controller/siteController.php?action=targets [QSA,L]
+RewriteRule ^profileinfo/?$ app/controller/siteController.php?action=profileinfo [QSA,L]
+
+#signin and signup
+RewriteRule ^signin/process/?$ app/controller/siteController.php?action=signinProcess [QSA,L]
+RewriteRule ^signup/?$ app/controller/siteController.php?action=signup [QSA,L]
+
+#jobs
+RewriteRule ^jobs/details/(\d+)/?$ app/controller/jobsController.php?action=viewJobPost&id=$1 [QSA,L]
+RewriteRule ^jobs/create/process/?$ app/controller/jobsController.php?action=createJobProcess [QSA,L]
+RewriteRule ^jobs/create/?$ app/controller/jobsController.php?action=createJobPost [QSA,L]
+RewriteRule ^jobs/edit/(\d+)/process/?$ app/controller/jobsController.php?action=editJobProcess&id=$1 [QSA,L]
+RewriteRule ^jobs/edit/(\d+)/?$ app/controller/jobsController.php?action=editJobPost&id=$1 [QSA,L]
+RewriteRule ^jobs/?$ app/controller/jobsController.php?action=jobs&jobsType=$1 [QSA,L]
+
+#applications
+RewriteRule ^addApplication/?$ app/controller/appsController.php?action=addApp [QSA,L]
+RewriteRule ^editApplications/process/(\d+)/?$ app/controller/appsController.php?action=editAppsProcess&id=$1 [QSA,L]
+RewriteRule ^editApplications/delete/(\d+)/?$ app/controller/appsController.php?action=deleteApp&id=$1 [QSA,L]
+RewriteRule ^editApplications/?$ app/controller/appsController.php?action=editApps [QSA,L]
+RewriteRule ^applications/?$ app/controller/appsController.php?action=listApps [QSA,L]
+
