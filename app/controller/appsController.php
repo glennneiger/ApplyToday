@@ -35,13 +35,11 @@ class AppsController {
                 $this->addApp();
                 break;
             case "editApps":
-                $this->editApps();
+		$this->editApps();
                 break;
-            case "editAppsProcess":
-                $appid = $_GET['id'];
-                $operation = $_POST['button'];
-                if($operation == "edit")
-                    $this->editAppsProcess($appid);
+            case "editAppsProcess": 
+                $appid = $_POST['id']; 
+                $this->editAppsProcess($appid); 
                 break;
             case "deleteApp":
                 $appid = $_GET["id"];
@@ -83,21 +81,37 @@ class AppsController {
     public function listApplications(){
         $creator_id = $this->getUserID();
         $pageName = "applications";
-        $result = Applications::getAllApps(null,$creator_id);
+        if (isset($_GET["page"])) { 
+            $page  = $_GET["page"]; 
+        } else { 
+            $page=1; 
+        }
+        $totalRows = Applications::getNumOfRows($creator_id);
+        $limit = 3;
+        $total_pages = ceil($totalRows/$limit);
+        $start_from = ($page-1)*$limit;
+        $result = Applications::getAllApps($limit,$creator_id, $start_from);
         $apps = array();
         foreach($result as &$row){
             $apps[] = $this->getAllCols($row);
         }    
-        include_once SYSTEM_PATH.'/view/header.tpl';
-        include_once SYSTEM_PATH.'/view/applications.tpl';
-        include_once SYSTEM_PATH.'/view/footer.tpl';
+        if(!isset($_GET["page"])){
+            include_once SYSTEM_PATH.'/view/header.tpl';
+            include_once SYSTEM_PATH.'/view/applications.tpl';
+            include_once SYSTEM_PATH.'/view/footer.tpl';
+        }
+        else{
+            header('Content-Type: application/json');
+            echo json_encode($apps); 
+        }
     }
     
     //function to call edit view in applications page
     public function editApps(){
         $pageName = "applications";
         $creator_id = $this->getUserId();
-        $result = Applications::getAllApps(null, $creator_id);
+        $totalRows = Applications::getNumOfRows($creator_id);
+        $result = Applications::getAllApps($totalRows, $creator_id, 0);
         $apps = array();
         foreach($result as &$row){
             $apps[] = $this->getAllCols($row);
@@ -119,22 +133,29 @@ class AppsController {
         
         $app = Applications::loadById($appid);
         $app->set(self::COL3, $company_name);
-	$app->set(self::COL4, $position);
-	$app->set(self::COL5, $job_url);
-	$app->set(self::COL6, $applied_date);
+        $app->set(self::COL4, $position);
+        $app->set(self::COL5, $job_url);
+        $app->set(self::COL6, $applied_date);
         $app->set(self::COL7, $resume_version);
         $app->set(self::COL8, $contact);
         $app->set(self::COL9, $status);
         
         $app->save();
-        header("LOCATION: ".BASE_URL."/editApplications");
+        //header("LOCATION: ".BASE_URL."/home");
+        header('Content-Type: application/html');
+        //$res = array("action", "success");
+        $res = "<p>success</p>";
+        //echo json_encode($res); 
+        echo $res;
     }
     
     //function to process delete view in applications page
     public function deleteApp($id){
         $obj = new Applications();
         $obj->deleteById($id);
-        header("LOCATION: ".BASE_URL."/editApplications");
+        header('Content-Type: application/json');
+        $res = array("action", "success");
+        echo json_encode($res);
     }
     
     //function to process create view in applications page
@@ -149,10 +170,13 @@ class AppsController {
         $app->set(self::COL7, $_POST[self::COL7]);
         $app->set(self::COL8, $_POST[self::COL8]);
         $app->set(self::COL9, $_POST[self::COL9]);
-        //echo $creator_id;
         $app->save();
-        header("LOCATION: ".BASE_URL."/editApplications");
-        
+        header('Content-Type: editApplications/text');
+        $resid = Applications::getLastRowId($creator_id);
+	echo $resid;
+	//$resobj = array("id", $resid);
+        //echo json_encode($resobj);
+        //header("LOCATION: ".BASE_URL."/editApplications");
     }
    
 }

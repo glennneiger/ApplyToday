@@ -20,7 +20,7 @@
             </tr>
             <?php foreach($apps as &$row){?>
             <tr>
-                <td><a href="<?=$row['job_url']?>"><?=$row['id']?></a></td>
+                <td><a href="<?='http://'.$row['job_url']?>"><?=$row['id']?></a></td>
                 <td><?=$row['company_name']?></td>
                 <td><?=$row['position']?></td>
                 <td><?=$row['applied_date']?></td>
@@ -30,7 +30,15 @@
             </tr>
             <?php } ?>
         </table>
-        
+        <div id="paginationDiv">
+            <ul id='pages'>
+            <?php if(!empty($total_pages)) for($i=1; $i<=$total_pages; $i++) if($i == 1){?>
+            <li class='active'  id="<?= $i?>"><button class="pageNum"><?= $i?></button></li> 
+            <?php } else{?>
+            <li id="<?= $i?>"><button class="pageNum"><?= $i?></button></li>         
+            <?php } ?>
+            </ul>
+        </div>
         </div>
         <div id="sidebar">
             <img src="<?= BASE_URL ?>/public/img/graph.PNG" alt="weekly activity">

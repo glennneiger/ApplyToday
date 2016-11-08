@@ -22,6 +22,10 @@ class SiteController{
             case "signup":
                 $this-> signup();
                 break;
+			case 'signupProcess':
+				$email = $_GET['email_id'];
+				$this->signup_process($email);
+				break;
             case "targets":
                 $this-> targets();
                 break;
@@ -51,6 +55,19 @@ class SiteController{
         include_once SYSTEM_PATH.'/view/signup.tpl';
         include_once SYSTEM_PATH.'/view/footer.tpl';
     }
+	
+	/*Signup processing*/
+	  public function signup_process($email){
+		  $use = new User();
+		  if ($use->loadByUsername($email)== null){
+				$json = array("status"=>"available");
+		  }
+		  else{
+			  $json = array("status"=>"unavailable");
+		  }
+		  header('Content_Type: application/json');
+		  echo json_encode($json);
+	  }
     
     //targets page
     public function targets(){

@@ -44,6 +44,9 @@
     <link rel = "stylesheet" type = "text/css" href = "<?= BASE_URL?>/public/css/styles.css">
     <script type="text/javascript" src="<?= BASE_URL?>/public/js/jquery-3.1.1.min.js"></script>
     <script type="text/javascript" src = "<?= BASE_URL?>/public/js/scripts.js"></script>
+    <script type="text/javascript">
+	var baseURL = '<?= BASE_URL ?>';
+    </script>
 </head>
 <body>
     <header>

@@ -93,7 +93,19 @@ class JobsController{
     }
     //placeholder for preferred jobs page, yet to be implemented
     public function preferredJobs(){
-        echo 'Page under construction.';
+       // echo 'Page under construction.';
+        $pageName = "preferredJobs";
+        $resultList = $this->getJobsList(); 
+        include_once SYSTEM_PATH.'/view/header.tpl';
+        include_once SYSTEM_PATH.'/view/preferredJobs.tpl';
+        include_once SYSTEM_PATH.'/view/footer.tpl';
+    }
+    
+    public function getJobsList() {
+        $endpoint = "http://service.dice.com/api/rest/jobsearch/v1/simple.json?text=java&country=CA&pgcnt=5";
+        $contents = file_get_contents($endpoint);
+	$obj = json_decode($contents);
+        return json_decode(json_encode($obj->{'resultItemList'}), True); //stdClass Object to Array
     }
     
     //function to call list view in suggested jobs page

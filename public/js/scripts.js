@@ -55,7 +55,37 @@ $(document).ready(function () {
        window.location = 'profileinfo.html';
     });
     
-    $(".customtable").on("click", ".edit", function(){
+    //pagination listener in applications page. 
+    $("#paginationDiv").on("click", "button.pageNum", function(e){
+        e.preventDefault();
+        $pageNum = $(this).text();
+        $(this).parent().siblings().removeClass("active");
+        $(this).parent().addClass("active");
+        $table = $(this).parent().parent().parent().parent().children("table");
+        $th='<tr> <th>Job ID / Link</th> <th>Company Name</th> <th>Position</th> <th>Applied Date</th> <th>Resume Version</th> <th>Contact</th> <th>Status</th></tr>';
+        $("#applications.table").html('');
+        $.get(
+                 baseURL+"/applications/",
+                 {"page" : $pageNum},
+                 function(data){
+                     $table.html('');
+                     $table.append($th);
+                     $(data).each(function(){
+                        $table.append('<tr><td><a href="'+this.job_url+'">'+this.id+'</a></td>'+
+                                '<td>'+this.company_name+'</td>'+
+                                '<td>'+this.position+'</td>'+
+                                '<td>'+this.applied_date+'</td>'+
+                                '<td>'+this.resume_version+'</td>'+
+                                '<td>'+this.contact+'</td>'+
+                                '<td>'+this.status+'</td></tr>'); 
+                     });
+                 },
+                 "json"
+        );
+    });
+    
+    $(".customtable").on("click", ".edit", function(e){
+        e.preventDefault();
        if($(this).siblings().hasClass("normalCell")){
             $(this).siblings().addClass("editedCell");
             $(this).siblings().removeClass("normalCell");
@@ -90,55 +120,100 @@ $(document).ready(function () {
             $field.attr("value", $field.parent().children("div.contact").text().trim());
             $field = $(this).parent().children("input.status");
             $field.attr("value", $field.parent().children("div.status").text().trim());
+            var appid = $(this).parent().children("div.id").text().trim();
+            var dataArray = $("#editApplication_"+appid).serializeArray();
+            var jsonObj = {};
+            $.each(dataArray, function(){
+               jsonObj[this.name] = this.value || ''; 
+            });
+            $.post(
+                 baseURL+"/editApplications/process/",
+                 jsonObj,
+                 function(data){
+                     //alert(data);
+                 },
+                 "html"
+             );
         }
     });
     
-    $(".delete").click(function(){
-        return confirm("Do you want to delete this application?");
-    });
-  /*
-    $(".customtable").on("click", ".normalCell", function(){
-       if($("td").hasClass("editableCell")){
-           $("td").attr("contenteditable", "false");
-           $("td").addClass("normalCell");
-           $("td").removeClass("editableCell");
-       }
-       $(this).addClass("editableCell");
-       $(".editableCell").attr("contenteditable", "true");
-       $(this).removeClass("normalCell");
+    //Delete button in application page
+    $(".customtable").on("click", ".delete", function(e){
+        e.preventDefault();
+        var parent = $(this).parent().parent();
+        if(confirm("Do you want to delete this application?")){
+            var appid = $(this).parent().children("div.id").text().trim();
+            $.get(
+                 baseURL+"/editApplications/delete/",
+                 {"id": appid},
+                 function(data){
+                     parent.slideUp(300,function() {
+			parent.remove();
+                    });
+                 },
+                 "json"
+             );
+        }       
     });
     
-    $("table").on("click", ".removeRow", function(){ 
-       $(this).parent().parent().remove(); 
-    });
-    
-    $(".customtable").on("click", ".addRow", function(){
-       var $row = $(this).parent().parent(); 
-       var $tds = $row.find("td");
-       $("table").find("tbody").find("tr").last().remove();
-       $("table").find("tbody").append($('<tr>'));
-       var newrow = $("table").find("tbody").find("tr").last();
-       
-       $.each($tds, function(){
-           newrow.append($('<td class = "normalCell" contenteditable="false">'));
-           newrow.find("td").last().text($(this).find("input").val());
-           newrow.find("td").find("input").append($('<input type="hidden" name="" value="">'));
-           //add name and value parameters with jobid_nameid and jobid_valueid
+    //listener for addApplication button in editApplications page.
+    $(".customtable").on("click", "#addApp", function(e){
+       e.preventDefault();
+       var dataArray = $("#addApplication").serializeArray();
+       var addRow = $(this).parent();
+       var jsonObj = {};
+       $.each(dataArray, function(){
+          jsonObj[this.name] = this.value || ''; 
        });
-       //adding close button
-       newrow.find("td").last().remove();
-       newrow.append("<td class='remove'> <button type='button' class='removeRow'> X </button></td>");
-     
-       //adding addElementRow again
-       $("table").find("tbody").append("<tr id='addApplication'><td>New</td><td><input type='text' name='company_name'></td><td><input type='text' name='jobrole'></td><td><input type='text' name='jobpostlink'></td><td><input type='date' name='applieddate'></td><td><input type='text' style='max-width: 100px' name='resumeversion'></td><td><input type='text' name='contact'></td><td><input type='text' name='status'></td><td class='add'> <button type='button' class='addRow'> + </button></td>");
-                
+        
+       $.post(
+                 baseURL+"/addApplication",
+                 jsonObj,
+                 function(id){
+                            $('<form id="editApplication_'+id+'" action="" method="POST">'+
+				'<div class="tablerow"><div class="tablecell normalCell id" contenteditable="false">'+id+'</div>'+
+                                '<div class="tablecell normalCell company_name" contenteditable="false">'+jsonObj.company_name.replace(/\"/g, "")+'</div>'+
+                                '<div class="tablecell normalCell position" contenteditable="false">'+jsonObj.position.replace(/\"/g, "")+'</div>'+
+                                '<div class="tablecell normalCell job_url" contenteditable="false">'+jsonObj.job_url.replace(/\"/g, "")+'</div>'+
+                                '<div class="tablecell normalCell applied_date" contenteditable="false">'+jsonObj.applied_date.replace(/\"/g, "")+'</div>'+
+                                '<div class="tablecell normalCell resume_version" contenteditable="false">'+jsonObj.resume_version.replace(/\"/g, "")+'</div>'+
+                                '<div class="tablecell normalCell contact" contenteditable="false">'+jsonObj.contact.replace(/\"/g, "")+'</div>'+
+                                '<div class="tablecell normalCell status" contenteditable="false">'+jsonObj.status.replace(/\"/g, "")+'</div>'+
+                                '<input class="id" type="hidden" name="id" value="'+id+'">'+
+                                '<input class="company_name" type="hidden" name="company_name" value="'+jsonObj.company_name.replace(/\"/g, "")+'">'+
+                                '<input class="position" type="hidden" name="position" value="'+jsonObj.position.replace(/\"/g, "")+'">'+
+                                '<input class="job_url" type="hidden" name="job_url" value="'+jsonObj.job_url.replace(/\"/g, "")+'">'+
+                                '<input class="applied_date" type="hidden" name="applied_date" value="'+jsonObj.applied_date.replace(/\"/g, "")+'">'+
+                                '<input class="resume_version" type="hidden" name="resume_version" value="'+jsonObj.resume_version.replace(/\"/g, "")+'">'+
+                                '<input class="contact" type="hidden" name="contact" value="'+jsonObj.contact.replace(/\"/g, "")+'">'+
+                                '<input class="status" type="hidden" name="status" value="'+jsonObj.status.replace(/\"/g, "")+'">'+
+                                '<button class="edit" form="'+id+'" name="edit" type="button" value="edit">&#9998</button>'+
+                                '<button class="delete" form="'+id+'" name="delete" type="button" value="delete">&#10060</button></div></form>').insertBefore("form#addApplication");  
+                 },
+                 "text"
+        );
+	addRow.children().children().val('');
     });
-    */
+   
     $(".deleteButton").click(function(){
        return confirm("Do you want to delete this post?"); 
     });
+
     
-    $("#deleteApplication").click(function(){
-       return confirm("Do you want to delete this application?"); 
+    $("#countries").click(function() {
+        $.post(baseURL+"/profileinfo/#/process/");
     });
+	
+	$("#signup_email_id").blur(function(){
+		var email = $(this).val();
+		$.get("signup/process", {'email_id': email}, function(data){
+			if (data.status=="unavailable"){
+				$("#signup_email_id").addClass('error');
+				alert("Selected email is not available!!!");
+			}
+			else{
+				$("#signup_email_id").removeClass('error');
+			}
+		}, "json");
+	});
 });

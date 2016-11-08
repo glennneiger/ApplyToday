@@ -61,7 +61,7 @@ class Applications extends DbObject{
             self::COL8 => $this->contact,
             self::COL9 => $this->status
             );
-       // print_r($db_properties);
+        //print_r($db_properties);
         $db->store($this, __CLASS__, self::DB_TABLE, $db_properties);
     }
     
@@ -73,8 +73,8 @@ class Applications extends DbObject{
     }
     
     // load all apps
-    public static function getAllApps($limit=null, $creator_id) {
-        $query = sprintf(" SELECT id FROM %s WHERE CREATOR_ID = '%s'",
+    public static function getAllApps($limit=null, $creator_id, $start_from=0) {
+        $query = sprintf(" SELECT id FROM %s WHERE CREATOR_ID = '%s' LIMIT $start_from, $limit",
             self::DB_TABLE,
             $creator_id    
             );
@@ -91,6 +91,18 @@ class Applications extends DbObject{
         }
     }
     
+    //return number of rows
+    public static function getNumOfRows($creator_id){
+        $query = sprintf("SELECT COUNT(*) AS ROWS FROM %s WHERE CREATOR_ID = '%s'",
+                self::DB_TABLE,
+                $creator_id
+                );
+        $db = Db::instance();
+        $result = $db->lookup($query);
+        $row = mysql_fetch_assoc($result);
+        return $row["ROWS"];
+    }
+    
     //delete object by ID
     public static function deleteById($rowid){
         $db = Db::instance();
@@ -100,5 +112,17 @@ class Applications extends DbObject{
         //echo $query;
         $db->execute($query);
     }
+
+    //getting last RowID
+    public static function getLastRowId($creator_id){
+        $query = sprintf("SELECT id FROM %s WHERE CREATOR_ID = '%s' ORDER BY id DESC LIMIT 1",
+                self::DB_TABLE,
+                $creator_id
+                );
+        $db = Db::instance();
+        $result = $db->lookup($query);
+        $row = mysql_fetch_assoc($result);
+        return $row["id"];
+    }	
     
 }

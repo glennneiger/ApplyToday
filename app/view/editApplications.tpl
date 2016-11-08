@@ -18,8 +18,8 @@
                 <div class="tablecell">Status</div>
             </div>
             <?php foreach($apps as &$row){?>
-            
-            <form id="editApplication_<?=$row['id']?>" action="<?=BASE_URL?>/editApplications/process/<?=$row['id']?>" method="POST">
+                
+            <form id="editApplication_<?=$row['id']?>" action="" method="POST">
                 <div class="tablerow">
                 <div class="tablecell normalCell id" contenteditable='false'>
                     <?=$row['id']?>                    
@@ -54,12 +54,12 @@
                 <input class="contact" type="hidden" name="contact" value="<?=$row['contact']?>">  
                 <input class="status" type="hidden" name="status" value="<?=$row['status']?>">
                 <button class='edit' form="<?=$row['id']?>" name='edit' type='button' value="edit">&#9998</button>
-                <a class='delete' href="<?=BASE_URL?>/editApplications/delete/<?=+$row['id']?>"> &#10060</a>
+                <button class='delete' form="<?=$row['id']?>" name='delete' type='button' value="delete">&#10060</a>
             </div>
             </form>
             
             <?php } ?>
-            <form id="addApplication" action="<?=BASE_URL?>/addApplication" method="POST">
+            <form id="addApplication" action="" method="POST">
                 <div class="tablerow">
                     <div class="tablecell">
                         New
@@ -89,7 +89,7 @@
                             <option>Rejected</option>
                         </select>
                     </div>
-                    <input form="addApplication" type='submit' name='add' value='&#9989'>
+                    <button id="addApp" form="addApplication" type='submit' name='add' value='addApp'>&#9989</button>
                 </div>
             </form>
         </div>

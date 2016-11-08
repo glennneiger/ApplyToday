@@ -3,7 +3,7 @@
         <div id = "signupbox">
                 <form id="signupform">
                     <button> Connect with LinkedIn </button><hr>
-                    <label> Email ID: </label><input type="text" name="email_id"><br>
+                    <label> Email ID: </label><input type="text" name="email_id" id="signup_email_id"><br>
                     <label> Password: </label><input type="password" name="password"><br>
                     <label> Confirm Password: </label><input type="password" name="confirm_pass"><br>
                     <label id="checkboxlabel"><input type="checkbox" name="t&c"> I agree with

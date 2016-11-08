@@ -52,7 +52,7 @@ class Db {
 		if($obj->getId() === null) {
 			// ID would only be null for a new item, so let's use INSERT		
 			$query = $this->buildInsertQuery($db_table, $data);
-			echo $query;
+			//echo $query;
 			$this->execute($query); // execute the query we've built
 			$obj->setId($this->getLastInsertID()); //get back the ID for the new item
 		} else {
